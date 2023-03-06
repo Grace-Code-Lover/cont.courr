@@ -1,0 +1,204 @@
+/* theme */
+:root {
+  --font-family: "Open Sans", sans-serif;
+  --primary: #8e44ad;
+  --dark: #2c3e50;
+  --background-light: #ecf0f1;
+  --text-color: #444;
+  --text-color-light: #fff;
+  --box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  --border: 1px solid #eee;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--text-color-light);
+}
+
+/* footer */
+
+footer {
+  display: flex;
+  background: var(--dark);
+  flex-flow: row-reverse;
+  color: var(--text-color-light);
+  padding: 1.5rem;
+  margin-top: 300px;
+}
+@import url("https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700");
+
+body {
+  background: url("http://all4desktop.com/data_images/original/4236532-background-images.jpg");
+  font-family: "Roboto Condensed", sans-serif;
+  color: #262626;
+  margin: 5% 0;
+}
+.material-symbols-outlined {
+  color: #613818;
+  font-variation-settings: "FILL" 0, "wght" 700, "GRAD" 200, "opsz" 48;
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+.title1 {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    color-stop(0, #5195a8),
+    color-stop(100, #70eaff)
+  );
+  background: -moz-linear-gradient(top left, #5c5d5e 0%, #5c5d5e 100%);
+  background: -ms-linear-gradient(top left, #5c5d5e 0%, #5c5d5e 100%);
+  background: -o-linear-gradient(top left, #5c5d5e 0%, #5c5d5e 100%);
+  background: linear-gradient(to bottom right, #5c5d5e 0%, #5c5d5e 100%);
+  border-radius: 5px 5px 0 0;
+  padding: 5px;
+  margin-bottom: 5px;
+  color: #f6f6f6;
+}
+.title {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    color-stop(0, #5195a8),
+    color-stop(100, #70eaff)
+  );
+  background: -moz-linear-gradient(top left, #613818 0%, #613818 100%);
+  background: -ms-linear-gradient(top left, #613818 0%, #613818 100%);
+  background: -o-linear-gradient(top left, #613818 0%, #613818 100%);
+  background: linear-gradient(to bottom right, #613818 0%, #613818 100%);
+  border-radius: 5px 5px 0 0;
+  padding: 5px;
+  margin-bottom: 5px;
+  color: #f6f6f6;
+}
+h2 {
+  margin: 0;
+  padding-left: 15px;
+}
+
+.required {
+  color: red;
+}
+label,
+table {
+  display: block;
+  margin: 5px;
+}
+label > span {
+  display: inline-block;
+  width: 100px;
+  margin-top: 5px;
+  padding-right: 10px;
+  color: #6d6c6b;
+}
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+select {
+  width: 300px;
+  margin-right: auto;
+  margin-left: auto;
+  display: inline-block;
+  text-align: center;
+  height: 25px;
+  border: 1px #613818;
+  color: #613818;
+  background-color: rgb(232, 232, 232);
+}
+select {
+  width: 300px;
+  height: 25px;
+  padding: 5px 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+.section1 {
+  width: 70%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+table {
+  margin: 0;
+  padding: 0;
+}
+th {
+  border-bottom: 1px solid #dadada;
+  padding: 10px 0;
+}
+tr > td:nth-child(1) {
+  text-align: left;
+  color: #2d2d2a;
+}
+tr > td:nth-child(2) {
+  text-align: right;
+  color: #52ad9c;
+}
+td {
+  border-bottom: 1px solid #dadada;
+  padding: 25px 25px 25px 0;
+}
+
+p {
+  display: block;
+  color: #888;
+  margin: 0;
+  padding-left: 25px;
+}
+.Yorder > div {
+  padding: 15px 0;
+}
+
+.submit {
+  width: 20%;
+  float: right;
+  padding: 5px;
+  border: none;
+  border-radius: 10px;
+  background: #5c5d5e;
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+}
+.submit:hover {
+  cursor: pointer;
+  background: #613818;
+}
+button,
+input[type="submit"] {
+  width: 20%;
+  float: right;
+  padding: 5px;
+  margin-right: 50px;
+  border: none;
+  border-radius: 5px;
+  background: #5c5d5e;
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+}
+button:hover,
+input[type="submit"]:hover {
+  cursor: pointer;
+  background: #613818;
+}
+
+span[class="error"] {
+  color: red;
+  display: block;
+  font-style: italic;
+}
