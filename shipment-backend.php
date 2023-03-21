@@ -103,9 +103,23 @@ if(isset($_POST['submit'])){
     // Vérifier si le postaldest est vide
     if(empty($_POST['postaldest'])) {
         $postaldestErr = "Le code postal est obligatoire";
-    } else {
-        $postaldest = test_input($_POST['postaldest']);
-    }
+      }
+      else {
+        if(strlen($_POST['postaldest']) <= 5) {
+          $postaldestErr = "Le code postal doit contenir au moins 6 charactères !";
+        }
+        else{
+            $postaldest = test_input($_POST['postaldest']);
+            //verifier que le code postal demande se ttrouve dans la zone attainte {
+            $checkP = $database->prepare('SELECT `zone` FROM `zonage` WHERE `code` = :postaldest');
+            $checkP->execute(array('postaldest' => str_split($postaldest,3)[0] ));
+            $pFound = $checkP->fetch();
+            //echo $pFound[0];
+            if(!$pFound){
+                $postaldestErr = "Nous n'atteignons pas encore cette zone";
+            }
+          }
+      }
 
     // Vérifier si le citydest est vide
     if(empty($_POST['citydest'])) {
@@ -163,6 +177,7 @@ if(isset($_POST['submit'])){
         $postnumberuser = '';
     }
 
+    echo "Name - ".!isset($destnameErr)." Comp. - ".!isset($companydestErr)." Pays - ".!isset($countrydestErr)." Address - ".!isset($houseAdressdestErr)." Code Postal - ".!isset($postaldestErr)." Ville - ".!isset($citydestErr)." Email- ".!isset($emaildestErr)."<br>";
 
     /******** REQUETE D'OBTENTION DU PRIX ******************/
     if( isset($zone_expedition) && isset($zone_destination) ) {
@@ -187,13 +202,44 @@ if(isset($_POST['submit'])){
 
     }
 
-
     /********* REQUETE D'ENREGISTREMENT DE L'EXPEDITION DANS LA BASE DE DONNEES */
-    if (isset($destname) && isset($companydest) && isset($countrydest) && isset($houseAdressdest) && isset($postaldest) && isset($citydest) && isset($emailDest)) {
-        $query = $database->prepare('INSERT INTO `shipment` (userid, houseAdressuser, phoneuser, postnumberuser, destname, companydest, countrydest, houseAdressdest, apartmentdest, postaldest, provincedest, citydest, emaildest, phonedest, postnumberdest) VALUES(
-          :userid, :houseAdressuser, :phoneuser, :postnumberuser, :destname, :companydest, :countrydest, :houseAdressdest, :apartmentdest, :postaldest, :provincedest, :citydest, :emaildest, :phonedest, :postnumberdest)');
-          $query->execute(array(
-            'userid' => $_SESSION['userid'],
+    if (!isset($destnameErr) && !isset($companydestErr) && !isset($countrydestErr) && !isset($houseAdressdestErr) && !isset($postaldestErr) && !isset($citydestErr) && !isset($emaildestErr)) {
+        //Obtaining shipment's number in Database
+        $queryNumber = $database->query('SELECT id FROM `shipment` ORDER BY id DESC LIMIT 1');
+        $lastNumber = $queryNumber->fetch();
+  
+        $_SESSION['shipment_id'] = (int)$lastNumber['id']+1;
+        echo $lastNumber['id'];
+
+        //Generating Tracking Number
+        function generateTrackingNumber($shippingCarrier, $shippingNumber) {
+            // Format the shipping date
+            $formattedDate = date('Ymd');
+            
+            // Generate a random 3-digit number
+            $randomNumber = str_pad(mt_rand(1000000000,9999999999), 10, '0', STR_PAD_LEFT);
+            
+            // Combine the elements to create the tracking number
+            //$trackingNumber = $shippingCarrier . '-' . $formattedDate . '-' . $shippingNumber . '-' . $randomNumber;
+            $trackingNumber = $shippingCarrier . '-' . $formattedDate . '-' . $randomNumber;
+            
+            return $trackingNumber;
+          }
+
+          //$shippingNumber = str_repeat("0",5-strlen($_SESSION['shipment_id'])).$_SESSION['shipment_id'];
+          $trackingNumber = generateTrackingNumber('CTL', $shippingNumber);
+          $_SESSION['trackingNumber'] =$trackingNumber;
+          $_SESSION['destname'] =$destname;
+          $_SESSION['houseAdressdest'] =$houseAdressdest;
+          $_SESSION['postaldest'] =$postaldest;
+          $_SESSION['countrydest'] =$countrydest;
+
+        
+        
+        $query = $database->prepare('INSERT INTO `shipment`(`userid`, `houseAdressuser`, `phoneuser`, `postnumberuser`, `destname`, `companydest`, `countrydest`, `houseAdressdest`, `apartmentdest`, `postaldest`, `provincedest`, `citydest`, `emaildest`, `phonedest`, `postnumberdest`, `trackingNumber`) VALUES(
+          :userid, :houseAdressuser, :phoneuser, :postnumberuser, :destname, :companydest, :countrydest, :houseAdressdest, :apartmentdest, :postaldest, :provincedest, :citydest, :emaildest, :phonedest, :postnumberdest, :trackingNumber)');
+          $done = $query->execute(array(
+            'userid' => $_SESSION['userId'],
             'houseAdressuser' => $houseAdressuser,
             'phoneuser' => $phoneuser,
             'postnumberuser' => $postnumberuser,
@@ -207,17 +253,13 @@ if(isset($_POST['submit'])){
             'citydest' => $citydest,
             'emaildest' => $emaildest,
             'phonedest' => $phonedest,
-            'postnumberdest' => $postnumberdest
+            'postnumberdest' => $postnumberdest,
+            'trackingNumber' => $trackingNumber
           ));
         
           
-          //Obtaining shipment's number in Database
-          $queryNumber = $database->query('SELECT id FROM `shipment` ORDER BY id DESC LIMIT 1');
-          $lastNumber = $queryNumber->fetch();
-    
-          $_SESSION['shipment_id'] = (int)$lastNumber['id'];
 
-          if($query){
+          if($done && $lastNumber){
             header('Location: shipment-detailsPage.php');
           }
     

@@ -6,6 +6,19 @@
         include 'includes/head.php'; 
         include 'loginDetails-form-validation.php';
     ?>
+    <script>
+        function echoInputValue(){
+          var inputValue = document.querySelector("input[name=emailVerifCode]").value;
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+              if (this.readyState == 4 && this.status == 200) {
+                  document.getElementById("emailVerifCode").innerHTML = this.responseText;
+              }
+          };
+          xhttp.open("GET", "mailDetails.php?emailVerifCode="+inputValue, true);
+          xhttp.send();
+        }
+    </script>
 </head>
 <body>
  <div class="container">
@@ -34,7 +47,14 @@
           <span>Confirmation de mot de passe</span>
           <input type="password" name="cpw">
           <span class="error" style="color:red; font-style:italic; display:block; width: 500px; font-size:12px"><?php echo isset($cpasswordErr) ? $cpasswordErr : ''; ?></span>
-        </label><br><br>
+        </label>
+        <label>
+          <span>Code de confirmation de mail</span>
+          <input type="number" name="emailVerifCode">
+          <span class="error" style="color:red; font-style:italic; display:block; width: 500px; font-size:12px"><?php echo isset($emailVerifCodeErr) ? $emailVerifCodeErr : ''; ?></span>
+          <div id="emailVerifCode"></div>
+        </label>
+        <br><br>
         <input type="checkbox" id="vehicle2" name="vehicle2" value="Car" required>
         <label for="vehicle2"> J'ai lu et compris les Conditions d'utilisation de Continentalcourrier.ca et j'accepte de m’y conformer. Je comprends en outre comment  Continental courrier entend utiliser les renseignements que je lui ai fournis, 
         en conformité avec la Politique de sécurité et de confidentialité. </label><br>
@@ -48,8 +68,9 @@
           <span>Annuler</span>
         </div>
         <div class="col-12 col-md-6">
+          <input type="submit" class="submit" name="renvoyerEmailConfirmation" value="Renvoyer le code"/>
           <!-- <input type="submit" class="submit" name="submit" value="Poursuivre" onclick="javascript: form.action='compte2.php';"/><br><br> -->
-          <input type="submit" class="submit" name="submit" value="Poursuivre"/><br><br>
+          <input type="button" class="submit" name="submit" value="Poursuivre"/><br><br>
         </div>
       </div>
   </div>

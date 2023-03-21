@@ -6,7 +6,7 @@ try {
 catch (Exception $e) {
   die('Erreur : ' . $e->getMessage());
 }
-
+session_start();
 // Fonction pour nettoyer les données de formulaire
 function test_input($data) {
   $data = trim($data);
@@ -66,17 +66,19 @@ if(isset($_POST['submit'])) {
   if(empty($_POST['postaluser'])) {
     $postaluserErr = "Le code postal est obligatoire";
   }
-  elseif(strlen($postaluser) <= 6) {
-    $passwordErr = "Le code postal doit contenir au moins 6 charactères !";
-  }
   else {
-    $postaluser = test_input($_POST['postaluser']);
-    //verifier que l'identifiant demande n'est pas deja prit {
-      $checkP = $database->prepare('SELECT `zone` FROM `zonage` WHERE `code` = :postaluser');
-      $checkP->execute(array('code' => str_split($code_postal_destination,3)[0] ));
-      $pFound = $checkP->fetch();
-      if(!$pFound){
-          $postaluserErr = "Cet identifiant est déjà prit, veuillez entrer un autre !";
+    if(strlen($_POST['postaluser']) <= 5) {
+      $postaluserErr = "Le code postal doit contenir au moins 6 charactères !";
+    }
+    else{
+        $postaluser = test_input($_POST['postaluser']);
+        //verifier que le code postal demande se ttrouve dans la zone attainte {
+        $checkP = $database->prepare('SELECT `zone` FROM `zonage` WHERE `code` = :postaluser');
+        $checkP->execute(array('postaluser' => str_split($postaluser,3)[0] ));
+        $pFound = $checkP->fetch();
+        if(!$pFound){
+            $postaluserErr = "Nous n'atteignons pas encore cette zone";
+        }
       }
   }
 
@@ -91,27 +93,31 @@ if(isset($_POST['submit'])) {
     if (isset($username) && isset($companyuser) && isset($countryuser) && isset($houseAdressuser) && isset($postaluser) && isset($cityuser) && isset($email)) {
       $query = $database->prepare('INSERT INTO user(username, companyuser, countryuser, houseAdressuser, apartmentuser, postaluser, provinceuser, cityuser, email) VALUES(
         :username, :companyuser, :countryuser, :houseAdressuser, :apartmentuser, :postaluser, :provinceuser, :cityuser, :email)');
-        $query->execute(array(
-        'username' => $_POST['username'],
-        'companyuser' => $_POST['companyuser'],
-        'countryuser' => $_POST['countryuser'],
-        'houseAdressuser' => $_POST['houseAdressuser'],
-        'apartmentuser' => $_POST['apartmentuser'],
-        'postaluser' => $_POST['postaluser'],
-        'provinceuser' => $_POST['provinceuser'],
-        'cityuser' => $_POST['cityuser'],
-        'email' => $_POST['email']));
+        $done = $query->execute(array(
+        'username' => $username,
+        'companyuser' => $companyuser,
+        'countryuser' => $countryuser,
+        'houseAdressuser' => $houseAdressuser,
+        'apartmentuser' => test_input($_POST['apartmentuser']),
+        'postaluser' => $postaluser,
+        'provinceuser' => test_input($_POST['provinceuser']),
+        'cityuser' => $cityuser,
+        'email' => $email));
       
         //echo 'Values : '.$_POST['username'].' - '.$_POST['companyuser'].' - '.$_POST['countryuser'].' - '.$_POST['houseAdressuser'].' - '.$_POST['apartmentuser'].' - '.$_POST['postaluser'].' - '.$_POST['provinceuser'].' - '.$_POST['cityuser'].' - '.$_POST['email'];
         
         //Obtaining user's number in Database
-        $queryNumber = $database->query('SELECT id FROM user ORDER BY id DESC LIMIT 1');
+        $queryNumber = $database->query('SELECT id,username FROM user ORDER BY id DESC LIMIT 1');
         $lastNumber = $queryNumber->fetch();
-      
-        session_start();
-        $_SESSION['id'] = (int)$lastNumber['id'];
 
-      if($query) {
+        // Envoyer l'e-mail de confirmation
+        require_once 'mailDetails.php';
+        mail($email, $sujet, $message, $headers);
+        $_SESSION['code_confirmation'] = $code_confirmation;
+        
+        $_SESSION['id'] = (int)$lastNumber['id'];
+        //$username = $_SESSION['username'];
+      if($done && $lastNumber) {
         header('Location: loginDetailsPage.php');
       }
     }  

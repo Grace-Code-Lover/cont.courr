@@ -2,6 +2,7 @@
 
     session_start();
     $id = $_SESSION['id'];
+    $code_confirmation = $_SESSION['code_confirmation'];
 
     try {
         $database = new PDO('mysql:host=localhost;dbname=continentalcourrier', 'root', '');
@@ -35,7 +36,18 @@
         
         }
 
+        if(empty($_POST['emailVerifCode'])) {
+            $emailVerifCodeErr = "Veuillez entrer votre code de confirmation";
+        } else{
+            $emailVerifCode = test_input($_POST['emailVerifCode']);
+        }
 
+        if(isset($_POST['renvoyerEmailConfirmation'])) {
+            // Renvoyer l'e-mail de confirmation
+            require_once 'mailDetails.php';
+            mail($email, $sujet, $message, $headers);
+            $_SESSION['code_confirmation'] = $code_confirmation;
+        }
 
         $password = test_input($_POST["pw"]);
         $cpassword = test_input($_POST["cpw"]);
@@ -55,11 +67,13 @@
         }elseif(empty($cpassword)){
             $cpasswordErr = "Veuillez confirmer votre mot de passe";
         }else{
-            if(isset($password) && isset($cpassword) && isset($userId)) {
-                $query = $database->prepare('UPDATE user SET userId = :userId, pw = :pw WHERE id = :id');
+            
+            if(isset($password) && isset($cpassword) && isset($userId) && ($emailVerifCode == $code_confirmation)) {
+                $query = $database->prepare('UPDATE user SET userId = :userId, pw = :pw, emailVerifCode = :emailVerifCode WHERE id = :id');
                 $query->execute(array(
                 'userId' => $userId,
                 'pw' => sha1($password),
+                'emailVerifCode' => $emailVerifCode,
                 'id' => $id));
                 $_SESSION['userId'] = $userId;
                 header('Location: signUpSuccessfulPage.php');
